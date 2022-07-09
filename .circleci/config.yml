@@ -9,18 +9,19 @@ jobs:
           name: 'Save hello world output'
           command: echo "text to output here" > output.txt
       - persist_to_workspace:
-          root: tmp/dir
-          paths: output.txt
+          root: ~/
+          paths:
+            - output.txt
 
   print_output_file:
     docker: # executor type
       - image: cimg/node:13.8.0
     steps:
+      - attach_workspace:
+          at: ~/
       - run:
           name: 'Print hello world output'
           command: cat output.txt
-      - attach_workspace:
-          at: tmp/dir
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
