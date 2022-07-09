@@ -2,6 +2,9 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
+# orbs:
+#   welcome: circleci/welcome-orb@0.4.1
+
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
@@ -20,7 +23,7 @@ jobs:
 
   print_hello:
     docker: # executor type
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - run:
           name: 'Hello'
@@ -28,11 +31,19 @@ jobs:
 
   print_world:
     docker: # executor type
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - run:
           name: 'World'
           command: 'echo world'
+
+  print_my_name:
+    docker: # executor type
+      - image: cimg/node:13.8.0
+    steps:
+      - run:
+          name: 'My name'
+          command: echo $MY_NAME
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -42,5 +53,5 @@ workflows:
       - say-hello
       - print_hello
       - print_world:
-        requires:
-          - print_hello
+          requires:
+            - print_hello
