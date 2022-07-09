@@ -1,58 +1,33 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
-# orbs:
-#   welcome: circleci/welcome-orb@0.4.1
-
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  say-hello:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
-    docker:
-      - image: cimg/base:stable
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
-    steps:
-      - checkout
-      - run:
-          name: 'Say hello'
-          command: 'echo Hello, World!'
-
-  print_hello:
+  save_hello_world_output:
     docker: # executor type
       - image: cimg/node:13.8.0
     steps:
       - run:
-          name: 'Hello'
-          command: 'echo hello'
+          name: 'Save hello world output'
+          command: echo "text to output here" > output.txt
+      - persist_to_workspace:
+          root: tmp/dir
+          paths: output.txt
 
-  print_world:
+  print_output_file:
     docker: # executor type
       - image: cimg/node:13.8.0
     steps:
       - run:
-          name: 'World'
-          command: 'echo world'
-
-  print_my_name:
-    docker: # executor type
-      - image: cimg/node:13.8.0
-    steps:
-      - run:
-          name: 'My name'
-          command: echo $MY_NAME
+          name: 'Print hello world output'
+          command: cat output.txt
+      - attach_workspace:
+          at: tmp/dir
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  say-hello-workflow:
+  save_and_print_workflow:
     jobs:
-      - say-hello
-      - print_hello
-      - print_world:
+      - save_hello_world_output
+      - print_output_file:
           requires:
-            - print_hello
-      - print_my_name
+            - save_hello_world_output
