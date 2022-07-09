@@ -1,9 +1,22 @@
 version: 2.1
 
+defaults: &defaults
+  docker: # executor type
+    - image: cimg/node:13.8.0
+
+commands:
+  say_hello:
+    description: 'A very command to print the pipeline ID'
+    parameters:
+      to:
+        type: string
+        default: 'Hello World'
+    steps:
+      - run: echo << parameters.to >>
+
 jobs:
   save_hello_world_output:
-    docker: # executor type
-      - image: cimg/node:13.8.0
+    <<: *defaults
     steps:
       - run:
           name: 'Save hello world output'
@@ -14,8 +27,7 @@ jobs:
             - output.txt
 
   print_output_file:
-    docker: # executor type
-      - image: cimg/node:13.8.0
+    <<: *defaults
     steps:
       - attach_workspace:
           at: .
@@ -23,12 +35,15 @@ jobs:
           name: 'Print hello world output'
           command: cat output.txt
 
+  say_hello_command:
+    <<: *defaults
+    steps:
+      - say_hello_command:
+          to: 'Lev'
+
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
   save_and_print_workflow:
     jobs:
-      - save_hello_world_output
-      - print_output_file:
-          requires:
-            - save_hello_world_output
+      - say_hello_command

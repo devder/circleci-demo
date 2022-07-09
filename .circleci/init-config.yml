@@ -43,7 +43,7 @@ jobs:
     steps:
       - run:
           name: 'My name'
-          command: echo $MY_NAME
+          command: echo $MY_NAME # this is an env var that was set from the web app console
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
