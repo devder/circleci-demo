@@ -38,7 +38,7 @@ jobs:
   say_hello_command:
     <<: *defaults
     steps:
-      - say_hello_command:
+      - say_hello:
           to: 'Lev'
 
 # Invoke jobs via workflows
