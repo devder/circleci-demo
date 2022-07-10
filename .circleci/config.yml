@@ -59,10 +59,9 @@ jobs:
   on_when_exec:
     <<: *defaults
     steps:
-      - print_pipeline_id:
-          id: << pipeline.trashy_something >>
+      - run: exit 1
       - run:
-          name: Upload Failed Tests
+          name: On error test
           # command: curl --data fail_tests.log http://example.com/error_logs
           command: echo 'Hello Error!'
           when: on_fail #callback
