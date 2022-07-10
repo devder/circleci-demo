@@ -53,11 +53,23 @@ jobs:
     <<: *defaults
     steps:
       - print_pipeline_id:
-          id: ${CIRCLE_WORKFLOW_ID}
+          # id: ${CIRCLE_WORKFLOW_ID} # still works
+          id: << pipeline.id >>
+
+  on_when_exec:
+    <<: *defaults
+    steps:
+      - print_pipeline_id:
+          id: << pipeline.trashy_something >>
+      - run:
+          name: Upload Failed Tests
+          # command: curl --data fail_tests.log http://example.com/error_logs
+          command: echo 'Hello Error!'
+          when: on_fail #callback
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
   save_and_print_workflow:
     jobs:
-      - print_pipe_id
+      - on_when_exec
