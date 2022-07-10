@@ -6,13 +6,18 @@ defaults: &defaults
 
 commands:
   say_hello:
-    description: 'A very command to print the pipeline ID'
+    description: 'A simple command to test'
     parameters:
       to:
         type: string
         default: 'Hello World'
     steps:
       - run: echo << parameters.to >>
+
+  print_pipeline_id:
+    description: 'A very command to print the pipeline ID'
+    steps:
+      - run: echo $CIRCLE_WORKFLOW_ID
 
 jobs:
   save_hello_world_output:
@@ -41,9 +46,14 @@ jobs:
       - say_hello:
           to: 'Lev'
 
+  print_pipe_id:
+    <<: *defaults
+    steps:
+      - print_pipeline_id
+
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
   save_and_print_workflow:
     jobs:
-      - say_hello_command
+      - print_pipe_id
