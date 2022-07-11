@@ -93,9 +93,9 @@ jobs:
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  save_and_print_workflow:
+  save_and_print_iv:
     jobs:
       - save_inventory_file
-      - print_inventory_file
+      - print_inventory_file:
           requires:
             - save_inventory_file
