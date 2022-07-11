@@ -66,9 +66,36 @@ jobs:
           command: echo 'Hello Error!'
           when: on_fail #callback
 
+  save_inventory_file:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: >
+          aws ec2 describe-instances \
+          \
+          --query 'Reservations[*].Instances[*].PublicIpAddress' \
+          --filters "Name=tag:Project,Values=udacity" \
+          --output text >> inventory
+      - save_cache:
+          key: 'inventory'
+          paths:
+            - /src
+
+  print_inventory_file:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - 'inventory'
+      - run: cat inventory
+
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
   save_and_print_workflow:
     jobs:
-      - on_when_exec
+      - save_inventory_file
+      - print_inventory_file
+          requires:
+            - save_inventory_file
