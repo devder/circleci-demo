@@ -1,0 +1,101 @@
+version: 2.1
+
+defaults: &defaults
+  docker: # executor type
+    - image: cimg/node:13.8.0
+
+commands:
+  say_hello:
+    description: 'A simple command to test'
+    parameters:
+      to:
+        type: string
+        default: 'Hello World'
+    steps:
+      - run: echo << parameters.to >>
+
+  print_pipeline_id:
+    description: 'A very command to print the pipeline ID'
+    parameters:
+      id:
+        type: string
+    steps:
+      - run: echo << parameters.id >>
+
+jobs:
+  save_hello_world_output:
+    <<: *defaults
+    steps:
+      - run:
+          name: 'Save hello world output'
+          command: echo "text to output here" > output.txt
+      - persist_to_workspace:
+          root: .
+          paths:
+            - output.txt
+
+  print_output_file:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: 'Print hello world output'
+          command: cat output.txt
+
+  say_hello_command:
+    <<: *defaults
+    steps:
+      - say_hello:
+          to: 'Lev'
+
+  print_pipe_id:
+    <<: *defaults
+    steps:
+      - print_pipeline_id:
+          # id: ${CIRCLE_WORKFLOW_ID} # still works
+          id: << pipeline.id >>
+
+  on_when_exec:
+    <<: *defaults
+    steps:
+      - run: exit 1
+      - run:
+          name: On error test
+          # command: curl --data fail_tests.log http://example.com/error_logs
+          command: echo 'Hello Error!'
+          when: on_fail #callback
+
+  save_inventory_file:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: >
+          aws ec2 describe-instances \
+          \
+          --query 'Reservations[*].Instances[*].PublicIpAddress' \
+          --filters "Name=tag:Project,Values=udacity" \
+          --output text >> inventory
+      - save_cache:
+          key: 'inventory'
+          paths:
+            - /src
+
+  print_inventory_file:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - 'inventory'
+      - run: cat inventory
+
+# Invoke jobs via workflows
+# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+workflows:
+  save_and_print_iv:
+    jobs:
+      - save_inventory_file
+      - print_inventory_file:
+          requires:
+            - save_inventory_file
