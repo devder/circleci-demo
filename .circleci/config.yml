@@ -10,11 +10,11 @@ defaults: &defaults
 
 jobs:
   myJob1:
-    <<: *defaults 
-      steps:
-        - checkout 
-        - run: echo "hello world"
-  
+    <<: *defaults
+    steps:
+      - checkout
+      - run: echo "hello world"
+
   create_infrastructure:
     docker:
       - image: amazon/aws-cli
