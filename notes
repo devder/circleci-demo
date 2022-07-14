@@ -1,0 +1,3 @@
+<!-- to add the ssh key from the .pem file to cicd, -->
+
+open the .pem file, copy the content and add it to ssh key in project setting in the circle ci
