@@ -1,0 +1,52 @@
+---
+- name: 'update apt packages.'
+  become: true
+  apt:
+    update_cache: yes
+
+- name: 'upgrade packages'
+  become: true
+  apt:
+    upgrade: yes
+
+- name: remove dependencies that are no longer required
+  become: true
+  apt:
+    autoremove: yes
+
+- name: 'install dependencies.'
+  become: true
+  apt:
+    name: ['nodejs', 'npm']
+    state: latest
+    update_cache: yes
+
+- name: 'install pm2'
+  become: true
+  npm:
+    name: pm2
+    global: yes
+    production: yes
+    state: present
+
+- name: Creates directory
+  file:
+    path: ~/web
+    state: directory
+
+- name: Copy index test page
+  copy:
+    # src: 'files/index.js' # not needed since ansible knows to look in the files directory for the file // also works for below template
+    # dest: 'var/www/html/index.html'
+    src: index.js
+    dest: '~/web/index.js'
+    backup: yes
+
+# - name: Copy index test page
+#   template:
+#     src: index.js
+#     dest: '~/web/index.js'
+
+- name: Executing node
+  shell: |
+    pm2 start ~/web/index.js -f
